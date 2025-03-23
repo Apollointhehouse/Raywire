@@ -1,16 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "raywire",
   "version": "${version}",
 
-  "name": "Example Mod",
+  "name": "Raywire",
   "description": "This mod aims to help new BTA modders.",
   "authors": [
-    "Turnip Labs"
+    "Apollointhehouse",
+		"Olypolyu"
   ],
   "contact": {
     "homepage": "",
-    "sources": ""
+    "sources": "https://github.com/Apollointhehouse/Raywire"
   },
 
   "license": "CC0-1.0",
@@ -20,30 +21,12 @@
     "main": [
       {
         "adapter": "kotlin",
-        "value": "turniplabs.examplemod.ExampleMod"
+        "value": "me.apollointhehouse.raywire.Raywire"
       }
-    ],
-    "beforeGameStart": [
-      {
-        "adapter": "kotlin",
-        "value": "turniplabs.examplemod.ExampleMod"
-      }
-		],
-    "afterGameStart": [
-      {
-        "adapter": "kotlin",
-        "value": "turniplabs.examplemod.ExampleMod"
-      }
-		],
-    "recipesReady": [
-      {
-        "adapter": "kotlin",
-        "value": "turniplabs.examplemod.ExampleMod"
-      }
-		]
+    ]
   },
   "mixins": [
-    "examplemod.mixins.json"
+		"raywire.mixins.json"
   ],
 
   "depends": {
