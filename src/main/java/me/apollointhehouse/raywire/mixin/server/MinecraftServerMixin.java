@@ -11,14 +11,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MinecraftServerMixin {
 	@Inject(method = "doTick", at = @At("HEAD"), cancellable = true)
 	public void preTick(CallbackInfo info) {
-		CancellableEvent event = new TickEvent.Pre();
-		event.invoke();
+		CancellableEvent event = TickEvent.Pre.INSTANCE;
+		event.call();
 		if (event.isCancelled()) info.cancel();
 	}
 
 	@Inject(method = "doTick", at = @At("RETURN"))
 	public void postTick(CallbackInfo info) {
-		Event event = new TickEvent.Post();
-		event.invoke();
+		Event event = TickEvent.Post.INSTANCE;
+		event.call();
 	}
 }

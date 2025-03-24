@@ -1,6 +1,7 @@
 package me.apollointhehouse.raywire.internal
 
 import me.apollointhehouse.raywire.api.*
+import me.apollointhehouse.raywire.Raywire.LOGGER
 import java.lang.reflect.Method
 
 typealias Callable = Pair<Any, Method>
@@ -51,16 +52,19 @@ internal class EventManager : Registry {
 	}
 
 	/**
-	 * Invokes all event handlers for given event
-	 * @param event Event that called invoke with [Event.invoke]
+	 * Invoke all event handlers for given event
+	 * @param event Event that called invoke with [Event.call]
 	 */
-	override operator fun invoke(event: Event) {
+	override fun invoke(event: Event) = try {
 		val callables = methodCache[event::class.java]?.toList() ?: return
 
 		for ((obj, method) in callables) {
 			method.isAccessible = true
 			method.invoke(obj, event)
 		}
+	} catch (e: Exception) {
+		LOGGER.error("Failed to invoke event: ${event::class.simpleName}")
+		e.printStackTrace()
 	}
 
 	/**
