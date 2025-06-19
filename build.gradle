@@ -3,6 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 plugins {
 	id("fabric-loom") version "1.7.bta"
 	id("org.jetbrains.kotlin.jvm") version "2.0.0"
+	id("maven-publish")
 }
 
 project.ext.lwjglVersion = "3.3.4"
@@ -156,3 +157,12 @@ processResources {
 }
 
 compileKotlin.kotlinOptions.jvmTarget = "1.8"
+
+// configure the maven publication
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+}
