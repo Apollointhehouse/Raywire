@@ -1,5 +1,9 @@
 package me.apollointhehouse.raywire.api
 
+import me.apollointhehouse.raywire.internal.EventManager
+
+fun Registry(): Registry = EventManager()
+
 interface Registry {
 	/**
 	 * Subscribes given object to scan for event handlers to be invoked

@@ -1,9 +1,9 @@
 package me.apollointhehouse.raywire
 
 import me.apollointhehouse.raywire.api.Registry
-import me.apollointhehouse.raywire.internal.EventManager
 import net.fabricmc.api.ModInitializer
-import org.slf4j.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 object Raywire : ModInitializer {
 	internal const val MOD_ID: String = "raywire"
@@ -12,5 +12,5 @@ object Raywire : ModInitializer {
 	override fun onInitialize() {
 	}
 
-	val registry: Registry = EventManager()
+	val registry = Registry()
 }
