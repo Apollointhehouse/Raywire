@@ -4,6 +4,8 @@
   "package": "me.apollointhehouse.raywire.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "core.NetworkManagerMixin",
+    "core.PacketMixin"
   ],
   "client": [
     "client.MinecraftMixin"

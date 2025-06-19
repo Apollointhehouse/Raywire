@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Raywire",
-  "description": "This mod aims to help new BTA modders.",
+  "description": "Very cool event library made for cool people who use kotlin",
   "authors": [
     "Apollointhehouse",
 		"Olypolyu"

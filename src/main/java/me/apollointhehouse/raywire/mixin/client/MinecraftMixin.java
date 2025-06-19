@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MinecraftMixin {
 	@Inject(method = "runTick", at = @At("HEAD"), cancellable = true)
 	public void preTick(CallbackInfo info) {
-		CancellableEvent event = TickEvent.Pre.INSTANCE;
+		TickEvent.Pre event = TickEvent.Pre.INSTANCE;
 		event.call();
 		if (event.isCancelled()) info.cancel();
 	}
