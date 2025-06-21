@@ -1,7 +1,7 @@
 package me.apollointhehouse.raywire.api
 
-import me.apollointhehouse.raywire.Raywire.registry
+import me.apollointhehouse.raywire.Raywire.globalRegistry
 
 interface Event {
-	fun call() = registry.invoke(this)
+	fun call() = globalRegistry.invoke(this)
 }

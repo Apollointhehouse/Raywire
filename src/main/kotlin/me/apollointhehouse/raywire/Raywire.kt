@@ -9,8 +9,7 @@ object Raywire : ModInitializer {
 	internal const val MOD_ID: String = "raywire"
 	@JvmField internal val LOGGER: Logger = LoggerFactory.getLogger(MOD_ID)
 
-	override fun onInitialize() {
-	}
+	override fun onInitialize() {}
 
-	val registry = Registry()
+	val globalRegistry = Registry()
 }
