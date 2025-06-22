@@ -42,7 +42,7 @@ The compiled JAR will be located in build/libs/.
 Add Raywire as a dependency in your mod's build.gradle.kts:
 ```kotlin
 dependencies {
-    modImplementation("me.apollointhehouse:Raywire:<version>")
+    modImplementation("com.github.Apollointhehouse:Raywire:<version>")
 }
 ```
 

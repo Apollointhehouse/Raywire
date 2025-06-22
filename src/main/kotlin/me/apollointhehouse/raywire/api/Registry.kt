@@ -19,7 +19,7 @@ interface Registry {
 
 	/**
 	 * Invokes all event handlers for given event
-	 * @param event Event that called invoke with [Event.call]
+	 * @param event Event being invoked
 	 */
 	fun invoke(event: Event)
 }
