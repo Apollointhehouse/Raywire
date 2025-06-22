@@ -1,37 +1,97 @@
-# Example Mod - Kotlin
+# Raywire
 
-Template for making Babric mods for BTA!
+Raywire is an event library for Better Than Adventure (BTA), designed to provide a flexible and efficient event-driven system for BTA mod developers. 
 
-**Note: *DO NOT fork this repository unless you want to contribute!***
+Written in Kotlin, Raywire makes it easy to create, subscribe to, and manage custom events within your BTA mods.
+
+## Features
+
+- Simple and extensible event bus system
+- Annotation-based event listeners
+- Priority-based event handling
+- Kotlin-first API, fully interoperable with Java
+- Lightweight and fast
 
 ## Prerequisites
-- JDK for Java 17 ([Eclipse Temurin](https://adoptium.net/temurin/releases/) recommended)
-- [Intellij IDEA](https://www.jetbrains.com/idea/download/) (Scroll down for the free community edition, if using linux **DO NOT** use the flatpak distribution)
-- Minecraft Development plugin (Optional, but highly recommended)
 
-## Setup instructions
-   
+- JDK 17 ([Eclipse Temurin](https://adoptium.net/temurin/releases/) recommended)
+- [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) (Community Edition is sufficient)
+- Gradle (handled automatically by IntelliJ)
+- Minecraft Development plugin (optional, but recommended)
+- BTA modding environment set up
 
-1. Click the `Use this template` button on this repo's page above. Choose `Create a new repository`, you will be redirected to a new page. Enter your repo's name and description, and hit `Create repository`.  
-   To get your project, open IntelliJ IDEA and click `Get from VCS`. Select `Repository URL` and enter your repo's url
+## Getting Started
 
-2. After the project has finished importing, close it and open it again.  
-   If that does not work, open the right sidebar with `Gradle` on it, open `Tasks` > `fabric` and run `ideaSyncTask`.
+### 1. Cloning the Repository
+Clone Raywire to your local machine:
+```sh
+git clone https://github.com/yourusername/raywire.git
+```
 
-3. Create a new run configuration by going in `Run > Edit Configurations`.  
-   Then click on the plus icon and select Gradle. In the `Tasks and Arguments` field enter `build`.  
-   Running it will build your finished jar files and put them in `build/libs/`.
+### 2. Importing the Project
+Open IntelliJ IDEA and select Open to import the project. IntelliJ will automatically detect the Gradle build and set up the environment.
 
-4. Lastly, open `File` > `Settings` and head to `Build, Execution, Development` > `Build Tools` > `Gradle`.  
-   Make sure `Build and run using` and `Run tests using` is set to `Gradle`.
+### 3. Building the Mod
+To build Raywire, use the Gradle build task:
+```sh
+./gradlew build
+```
+The compiled JAR will be located in build/libs/.
 
-5. Done! Now, all that's left is to change every mention of `examplemod` and `turniplabs` to your own mod id and mod group, respectively. Happy modding!
+### 4. Using Raywire in Your Mod
+Add Raywire as a dependency in your mod's build.gradle.kts:
+```kotlin
+dependencies {
+    modImplementation("me.apollointhehouse:Raywire:<version>")
+}
+```
 
-## Tips
+Replace <version> with the latest Raywire release.
 
-1. If you haven't already you should join the BTA modding discord! https://discord.gg/FTUNJhswBT
-2. You can set your username when launching the client run configuration by setting `--username <username>` in your program arguments.
-3. When launching the server run configuration you may want to remove the `nogui` program argument in order to see the regular server GUI.
-4. In Intellij you can double press shift or press ctrl+N to search class files, change the search from the default `Project Files` to `All Places` you can easily explore the classes for you dependencies and even BTA itself.
-5. In Intellij if ctrl+left click on a field or method you can quickly get information on when and where that field or method is assign or used.
+## Example Usage
+Create an event listener in Kotlin:
+```kotlin
+class Foo {
+    @EventHandler
+    fun onTick(event: TickEvent.Post) {
+        println("Tick event!")
+    }
+    
+    @EventHandler
+    fun onFooEvent(event: FooEvent) {
+        println("Foo event with bar: ${event.bar}")
+    }   
+}
+```
 
+Create an event:
+```kotlin
+class FooEvent(val bar: String) : Event
+```
+
+Create an event registry:
+```kotlin
+val registry = Registry()
+```
+
+Or use the global registry:
+```kotlin
+val registry = Raywire.globalRegistry
+```
+
+Then subscribe the listener:
+```kotlin
+registry.subscribe(Foo())
+```
+
+Post an event:
+```kotlin
+registry.invoke(FooEvent(bar))
+```
+
+## Contributing
+Contributions are welcome! Please open issues or pull requests on the [GitHub repository](https://github.com/Apollointhehouse/Raywire).
+
+
+## License
+Raywire is licensed under the MIT License. See the LICENSE file for details.
