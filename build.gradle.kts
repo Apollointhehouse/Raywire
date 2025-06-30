@@ -133,9 +133,9 @@ dependencies {
 	implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
 	implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
 
-	modImplementation("net.fabricmc:fabric-language-kotlin:$flk_version+kotlin.$kotlin_version") {
-		exclude(group = "net.fabricmc", module = "fabric-loader")
-	}
+    modImplementation("net.fabricmc:fabric-language-kotlin:1.11.0+kotlin.2.0.0") {
+        exclude(group = "net.fabricmc", module = "fabric-loader")
+    }
 }
 
 java {

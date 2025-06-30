@@ -6,7 +6,7 @@ import java.lang.reflect.Method
 
 typealias Callable = Pair<Any, Method>
 
-internal class EventManager : Registry {
+internal class EventManager : Bus {
 	private val methodCache: MutableMap<Class<out Any>, MutableList<Callable>> = mutableMapOf()
 	private val objectEventMap: MutableMap<Any, MutableList<Class<out Any>>>   = mutableMapOf()
 
@@ -53,9 +53,9 @@ internal class EventManager : Registry {
 
 	/**
 	 * Invoke all event handlers for given event
-	 * @param event Event that called invoke with [Event.call]
+	 * @param event Event that called post
 	 */
-	override fun invoke(event: Event) = try {
+	override fun post(event: Event) = try {
 		val callables = methodCache[event::class.java]?.toList() ?: return
 
 		for ((obj, method) in callables) {

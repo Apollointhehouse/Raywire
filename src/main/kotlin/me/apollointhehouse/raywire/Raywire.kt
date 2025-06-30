@@ -1,6 +1,6 @@
 package me.apollointhehouse.raywire
 
-import me.apollointhehouse.raywire.api.Registry
+import me.apollointhehouse.raywire.api.Bus
 import net.fabricmc.api.ModInitializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -11,5 +11,5 @@ object Raywire : ModInitializer {
 
 	override fun onInitialize() {}
 
-	val globalRegistry = Registry()
+	val globalBus = Bus()
 }
