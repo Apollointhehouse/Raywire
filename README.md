@@ -69,14 +69,14 @@ Create an event:
 class FooEvent(val bar: String) : Event
 ```
 
-Create an event registry:
+Create an event bus:
 ```kotlin
-val registry = Registry()
+val bus = Bus()
 ```
 
 Or use the global registry:
 ```kotlin
-val registry = Raywire.globalRegistry
+val bus = Raywire.globalBus
 ```
 
 Then subscribe the listener:
@@ -86,7 +86,7 @@ registry.subscribe(Foo())
 
 Post an event:
 ```kotlin
-registry.invoke(FooEvent(bar))
+registry.post(FooEvent(bar))
 ```
 
 ## Contributing
