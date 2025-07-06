@@ -46,7 +46,7 @@ dependencies {
 }
 ```
 
-Replace <version> with the latest Raywire release.
+Replace \<version\> with the latest Raywire release.
 
 ## Example Usage
 Create an event listener in Kotlin:
@@ -74,20 +74,24 @@ Create an event bus:
 val bus = Bus()
 ```
 
-Or use the global registry:
+Or use the global bus:
 ```kotlin
 val bus = Raywire.globalBus
 ```
 
 Then subscribe the listener:
 ```kotlin
-registry.subscribe(Foo())
+bus.subscribe(Foo())
 ```
 
 Post an event:
 ```kotlin
-registry.post(FooEvent(bar))
+bus.post(FooEvent(bar))
 ```
+
+## Dependencies
+
+- [Fabric Language Kotlin 1.11.0](https://github.com/FabricMC/fabric-language-kotlin)
 
 ## Contributing
 Contributions are welcome! Please open issues or pull requests on the [GitHub repository](https://github.com/Apollointhehouse/Raywire).
