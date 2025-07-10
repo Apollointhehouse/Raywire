@@ -16,29 +16,10 @@ Written in Kotlin, Raywire makes it easy to create, subscribe to, and manage cus
 
 - JDK 17 ([Eclipse Temurin](https://adoptium.net/temurin/releases/) recommended)
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) (Community Edition is sufficient)
-- Gradle (handled automatically by IntelliJ)
 - Minecraft Development plugin (optional, but recommended)
 - BTA modding environment set up
 
-## Getting Started
-
-### 1. Cloning the Repository
-Clone Raywire to your local machine:
-```sh
-git clone https://github.com/yourusername/raywire.git
-```
-
-### 2. Importing the Project
-Open IntelliJ IDEA and select Open to import the project. IntelliJ will automatically detect the Gradle build and set up the environment.
-
-### 3. Building the Mod
-To build Raywire, use the Gradle build task:
-```sh
-./gradlew build
-```
-The compiled JAR will be located in build/libs/.
-
-### 4. Using Raywire in Your Mod
+## Using Raywire in Your Mod
 Add Raywire as a dependency in your mod's build.gradle.kts:
 ```kotlin
 dependencies {
