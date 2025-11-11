@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory
 
 object Raywire {
 	internal const val MOD_ID: String = "raywire"
-	@JvmField internal val LOGGER: Logger = LoggerFactory.getLogger(MOD_ID)
+	internal val LOGGER: Logger = LoggerFactory.getLogger(MOD_ID)
 
 	val globalBus = Bus()
 }
