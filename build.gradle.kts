@@ -26,11 +26,7 @@ val bta_channel: String by project
 val bta_version: String by project
 
 val loader_version: String by project
-val halplibe_version: String by project
 val mod_menu_version: String by project
-val flk_version: String by project
-
-val kotlin_version: String by project
 
 group = mod_group
 base.archivesName.set(mod_name)
@@ -97,10 +93,6 @@ dependencies {
 	modRuntimeOnly("objects:client:43db9b498cb67058d2e12d394e6507722e71bb45") // https://piston-data.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar
 	modImplementation("net.fabricmc:fabric-loader:$loader_version")
 
-	// Helper library
-	// If you do not need Halplibe you can comment this line out or delete this line
-//	modImplementation("turniplabs:halplibe:$halplibe_version")
-
 	modImplementation("turniplabs:modmenu-bta:$mod_menu_version")
 
 	implementation("org.slf4j:slf4j-api:1.8.0-beta4")
@@ -132,10 +124,6 @@ dependencies {
 	implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
 	implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
 	implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
-
-    modImplementation("net.fabricmc:fabric-language-kotlin:1.11.0+kotlin.2.0.0") {
-        exclude(group = "net.fabricmc", module = "fabric-loader")
-    }
 }
 
 java {

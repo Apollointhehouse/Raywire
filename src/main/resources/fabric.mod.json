@@ -17,22 +17,10 @@
   "license": "MIT",
 
   "environment": "*",
-  "entrypoints": {
-    "main": [
-      {
-        "adapter": "kotlin",
-        "value": "me.apollointhehouse.raywire.Raywire"
-      }
-    ]
-  },
-  "mixins": [
-		"raywire.mixins.json"
-  ],
 
   "depends": {
 		"minecraft": "*",
-    "fabricloader": ">=0.15.5",
-    "fabric-language-kotlin": "*"
+    "fabricloader": ">=0.15.5"
   },
   "suggests": {
   }
