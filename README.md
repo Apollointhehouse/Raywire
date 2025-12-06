@@ -23,7 +23,7 @@ Written in Kotlin, Raywire makes it easy to create, subscribe to, and manage cus
 Add Raywire as a dependency in your mod's build.gradle.kts:
 ```kotlin
 dependencies {
-    modImplementation("com.github.Apollointhehouse:Raywire:<version>")
+    implementation("com.github.Apollointhehouse:Raywire:<version>")
 }
 ```
 
@@ -72,7 +72,7 @@ bus.post(FooEvent(bar))
 
 ## Dependencies
 
-- [Fabric Language Kotlin 1.11.0](https://github.com/FabricMC/fabric-language-kotlin)
+- [Fabric Language Kotlin](https://github.com/FabricMC/fabric-language-kotlin)
 
 ## Contributing
 Contributions are welcome! Please open issues or pull requests on the [GitHub repository](https://github.com/Apollointhehouse/Raywire).

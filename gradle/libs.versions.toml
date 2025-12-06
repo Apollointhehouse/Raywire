@@ -5,6 +5,8 @@
 loom = "1.14-SNAPSHOT"
 # Check this on https://kotlinlang.org/docs/releases.html
 kotlin = "2.2.21"
+# Check this on https://plugins.gradle.org/plugin/dev.yumi.gradle.licenser/
+yumiGradleLicenser = "2.2.1"
 # Check this on https://plugins.gradle.org/plugin/com.smushytaco.lwjgl3/
 lwjglPlugin = "1.0.0"
 ##########################################################################
@@ -62,4 +64,5 @@ clientJar = { group = "objects", name = "client", version = "43db9b498cb67058d2e
 [plugins]
 loom = { id = "net.fabricmc.fabric-loom", version.ref = "loom" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+yumiGradleLicenser = { id = "dev.yumi.gradle.licenser", version.ref = "yumiGradleLicenser" }
 lwjgl = { id = "com.smushytaco.lwjgl3", version.ref = "lwjglPlugin" }
