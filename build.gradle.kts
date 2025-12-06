@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	alias(libs.plugins.loom)
 	alias(libs.plugins.kotlin.jvm)
+	alias(libs.plugins.yumiGradleLicenser)
 	alias(libs.plugins.lwjgl)
 	java
 	`maven-publish`
@@ -146,4 +147,9 @@ publishing {
 			from(components["java"])
 		}
 	}
+}
+license {
+	rule(file("./HEADER"))
+	include("**/*.kt")
+	exclude("**/*.properties")
 }
