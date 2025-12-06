@@ -65,7 +65,6 @@ internal class EventManager : Bus {
         }
     }
 
-    @Suppress("kotlin:S6518")
     override fun unsubscribe(obj: Any) {
         synchronized(lock) {
             objectEventMap[obj]?.forEach { eventClass ->
@@ -79,7 +78,6 @@ internal class EventManager : Bus {
         }
     }
 
-    @Suppress("kotlin:S6518")
     override fun post(event: Event, respectCancels: Boolean) {
         val cancellable = if (respectCancels) event as? Cancellable else null
 
