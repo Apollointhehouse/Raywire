@@ -23,5 +23,7 @@ interface Modifiable {
         operator fun invoke(): Modifiable = ModifiableImpl()
     }
 
-    var modified: Boolean
+    val modified: Boolean
+
+    fun markModified()
 }

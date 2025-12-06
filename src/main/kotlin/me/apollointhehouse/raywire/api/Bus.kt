@@ -38,5 +38,12 @@ interface Bus {
      * Invokes all event handlers for given event
      * @param event Event being posted
      */
-    fun post(event: Event)
+    @Suppress("unused")
+    fun post(event: Event) = post(event, false)
+    /**
+     * Invokes all event handlers for given event
+     * @param event Event being posted
+     * @param respectCancels If true, and the event implements [Cancellable], once a handler cancels the event, no further handlers are invoked.
+     */
+    fun post(event: Event, respectCancels: Boolean)
 }

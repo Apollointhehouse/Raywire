@@ -23,7 +23,7 @@ interface Cancellable {
         operator fun invoke(): Cancellable = CancellableImpl()
     }
 
-    fun isCancelled(): Boolean
+    val cancelled: Boolean
 
     fun cancel()
 }
