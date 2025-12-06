@@ -23,6 +23,7 @@ import me.apollointhehouse.raywire.api.Event
 import me.apollointhehouse.raywire.api.EventHandler
 import java.lang.ref.WeakReference
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.util.WeakHashMap
 import kotlin.collections.ArrayDeque
 
@@ -40,7 +41,13 @@ internal class EventManager : Bus {
 
             val methods = allDeclaredMethods(klass)
                 .filter { it.isValid() }
-                .onEach { it.isAccessible = true }
+                .onEach {
+                    try {
+                        it.isAccessible = true
+                    } catch (e: Exception) {
+                        LOGGER.error("Failed to make ${it.name} accessible.", e)
+                    }
+                }
                 .toList()
 
             for (method in methods) {
@@ -108,6 +115,7 @@ internal class EventManager : Bus {
      */
     private fun Method.isValid(): Boolean {
         if (!isAnnotationPresent(EventHandler::class.java)) return false
+        if (Modifier.isStatic(modifiers)) return false
         if (returnType != Void.TYPE) return false
         if (parameterCount != 1) return false
 
