@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Raywire",
-  "description": "Very cool event library made for cool people who use kotlin",
+  "description": "An event library for Better Than Adventure",
   "authors": [
     "Apollointhehouse",
 		"Olypolyu"
@@ -20,7 +20,8 @@
 
   "depends": {
 		"minecraft": "*",
-    "fabricloader": ">=0.15.5"
+    "fabricloader": ">=0.15.5",
+		"fabric-language-kotlin": "*"
   },
   "suggests": {
   }
