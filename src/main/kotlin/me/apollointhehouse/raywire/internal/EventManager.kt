@@ -44,8 +44,8 @@ internal class EventManager : Bus {
                 .toList()
 
             for (method in methods) {
-                val eventClass = method.parameterTypes[0]
-                if (eventClass !is Class<out Event>) continue
+                @Suppress("UNCHECKED_CAST")
+                val eventClass = method.parameterTypes[0] as Class<out Event>
                 val priority = method.getAnnotation(EventHandler::class.java).priority
                 val handler = Handler(WeakReference(obj), method, priority)
 
@@ -83,7 +83,7 @@ internal class EventManager : Bus {
     override fun post(event: Event, respectCancels: Boolean) {
         val cancellable = if (respectCancels) event as? Cancellable else null
 
-        if (cancellable?.isCancelled() == true) return
+        if (cancellable?.cancelled == true) return
 
         val handlers = synchronized(lock) {
             val eventClass = event::class.java
@@ -94,7 +94,7 @@ internal class EventManager : Bus {
         }
 
         for (handler in handlers) {
-            if (cancellable?.isCancelled() == true) break
+            if (cancellable?.cancelled == true) break
             try {
                 val target = handler.target.get() ?: continue
                 handler.method.invoke(target, event)
