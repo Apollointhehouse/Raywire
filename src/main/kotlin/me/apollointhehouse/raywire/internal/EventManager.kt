@@ -21,6 +21,9 @@ import me.apollointhehouse.raywire.api.Bus
 import me.apollointhehouse.raywire.api.Cancellable
 import me.apollointhehouse.raywire.api.Event
 import me.apollointhehouse.raywire.api.EventHandler
+import java.lang.invoke.LambdaMetafactory
+import java.lang.invoke.MethodHandles
+import java.lang.invoke.MethodType
 import java.lang.ref.WeakReference
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
@@ -54,7 +57,7 @@ internal class EventManager : Bus {
                 @Suppress("UNCHECKED_CAST")
                 val eventClass = method.parameterTypes[0] as Class<out Event>
                 val priority = method.getAnnotation(EventHandler::class.java).priority
-                val handler = Handler(WeakReference(obj), method, priority)
+                val handler = Handler(WeakReference(obj), createInvoker(method), priority)
 
                 val list = methodCache.getOrPut(eventClass) { mutableListOf() }
 
@@ -102,7 +105,7 @@ internal class EventManager : Bus {
             if (cancellable?.cancelled == true) break
             try {
                 val target = handler.target.get() ?: continue
-                handler.method.invoke(target, event)
+                handler.invoker(target, event)
             } catch (e: Exception) {
                 LOGGER.error("Failed to invoke handler for event: ${event::class.simpleName}", e)
             }
@@ -173,5 +176,31 @@ internal class EventManager : Bus {
         }
 
         return result
+    }
+    private fun createInvoker(method: Method): EventInvoker {
+        return try {
+            val lookup = MethodHandles.lookup()
+            val handle = lookup.unreflect(method)
+            val samMethodType = MethodType.methodType(Void.TYPE, Any::class.java, Event::class.java)
+            val invokedType = MethodType.methodType(EventInvoker::class.java)
+            val implMethodType = handle.type()
+
+            val callSite = LambdaMetafactory.metafactory(
+                lookup,
+                "invoke",
+                invokedType,
+                samMethodType,
+                handle,
+                implMethodType
+            )
+
+            val factory = callSite.target
+            factory.invokeExact() as EventInvoker
+        } catch (t: Throwable) {
+            LOGGER.error("Failed to create lambda invoker for ${method.declaringClass.name}#${method.name}, falling back to reflection.", t)
+            EventInvoker { target, event ->
+                method.invoke(target, event)
+            }
+        }
     }
 }
