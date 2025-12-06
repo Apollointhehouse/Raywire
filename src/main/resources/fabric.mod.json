@@ -7,7 +7,8 @@
   "description": "An event library for Better Than Adventure",
   "authors": [
     "Apollointhehouse",
-		"Olypolyu"
+		"Olypolyu",
+		"SmushyTaco"
   ],
   "contact": {
     "homepage": "",
@@ -18,11 +19,13 @@
 
   "environment": "*",
 
-  "depends": {
+	"depends": {
+		"fabricloader": ">=${fabricloader}",
+		"fabric-language-kotlin": ">=${fabric_language_kotlin}",
 		"minecraft": "*",
-    "fabricloader": ">=0.15.5",
-		"fabric-language-kotlin": "*"
-  },
-  "suggests": {
-  }
+		"java": ">=${java}"
+	},
+	"suggests": {
+		"modmenu": ">=${modmenu}"
+	}
 }

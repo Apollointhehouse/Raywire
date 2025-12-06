@@ -2,87 +2,126 @@ package me.apollointhehouse.raywire.internal
 
 import me.apollointhehouse.raywire.api.*
 import me.apollointhehouse.raywire.Raywire.LOGGER
+import java.lang.ref.WeakReference
 import java.lang.reflect.Method
-
-typealias Callable = Pair<Any, Method>
+import java.util.WeakHashMap
 
 internal class EventManager : Bus {
-	private val methodCache: MutableMap<Class<out Any>, MutableList<Callable>> = mutableMapOf()
-	private val objectEventMap: MutableMap<Any, MutableList<Class<out Any>>>   = mutableMapOf()
+    private val lock = Any()
+    private val methodCache: MutableMap<Class<*>, MutableList<Handler>> = mutableMapOf()
+    private val objectEventMap: MutableMap<Any, MutableList<Class<out Any>>> = WeakHashMap()
 
-	/**
-	 * Subscribes given object to scan for event handlers to be invoked
-	 * @param obj the object to be subscribed
-	 */
-	override fun subscribe(obj: Any) {
-		val klass = obj::class.java
+    /**
+     * Subscribes given object to scan for event handlers to be invoked
+     * @param obj the object to be subscribed
+     */
+    override fun subscribe(obj: Any) {
+        synchronized(lock) {
+            if (objectEventMap.containsKey(obj)) return
 
-		// Get all valid EventHandler methods
-		val methods = klass.methods
-			.asSequence()
-			.filter { it.isValid() }
-			.prioritize()
-			.toList()
+            val klass = obj::class.java
 
-		for (method in methods) {
-			// Cache the methods for each event
-			val eventClass = method.parameterTypes[0] ?: continue
-			if (!methodCache.containsKey(eventClass)) {
-				methodCache[eventClass] = mutableListOf()
-			}
-			methodCache[eventClass]?.add(obj to method)
+            val methods = allDeclaredMethods(klass)
+                .filter { it.isValid() }
+                .onEach { it.isAccessible = true }
+                .toList()
 
-			// Cache the events for each object
-			if (!objectEventMap.containsKey(obj)) {
-				objectEventMap[obj] = mutableListOf()
-			}
-			objectEventMap[obj]?.add(eventClass)
-		}
-	}
+            for (method in methods) {
+                val eventClass = method.parameterTypes[0]
+                val priority = method.getAnnotation(EventHandler::class.java).priority
+                val handler = Handler(WeakReference(obj), method, priority)
 
-	/**
-	 * Unsubscribes given object from being scanned for event handlers to be invoked
-	 * @param obj the object to be unsubscribed
-	 */
-	override fun unsubscribe(obj: Any) {
-		objectEventMap[obj]?.forEach { eventClass ->
-			methodCache[eventClass]?.removeIf { it.first == obj }
-		}
-		objectEventMap.remove(obj)
-	}
+                val list = methodCache.getOrPut(eventClass) { mutableListOf() }
 
-	/**
-	 * Invoke all event handlers for given event
-	 * @param event Event that called post
-	 */
-	override fun post(event: Event) = try {
-		val callables = methodCache[event::class.java]?.toList() ?: return
+                // insert sorted by priority (highest first)
+                val index = list.indexOfFirst { it.priority < priority }
+                if (index == -1) {
+                    list.add(handler)
+                } else {
+                    list.add(index, handler)
+                }
 
-		for ((obj, method) in callables) {
-			method.isAccessible = true
-			method.invoke(obj, event)
-		}
-	} catch (e: Exception) {
-		LOGGER.error("Failed to invoke event: ${event::class.simpleName}")
-		e.printStackTrace()
-	}
+                objectEventMap.getOrPut(obj) { mutableListOf() }.add(eventClass)
+            }
+        }
+    }
 
-	/**
-	 * Used to check if Method is valid for Event handling
-	 * @return true if Method is valid
-	 */
-	private fun Method.isValid(): Boolean {
-		if (!isAnnotationPresent(EventHandler::class.java)) return false
-		if (returnType != Void.TYPE) return false
-		if (parameterCount != 1) return false
 
-		return parameterTypes[0]::class.java.isInstance(Event::class.java)
-	}
+    /**
+     * Unsubscribes given object from being scanned for event handlers to be invoked
+     * @param obj the object to be unsubscribed
+     */
+    @Suppress("kotlin:S6518")
+    override fun unsubscribe(obj: Any) {
+        synchronized(lock) {
+            objectEventMap[obj]?.forEach { eventClass ->
+                methodCache[eventClass]?.removeIf {
+                    val target = it.target.get()
+                    target == null || target === obj
+                }
+            }
+            objectEventMap.remove(obj)
+        }
+    }
 
-	/**
-	 * Used for setting up Event invocation priority
-	 * @return Sorted list by annotation priority
-	 */
-	private fun Sequence<Method>.prioritize(): Sequence<Method> =
-		sortedByDescending { it.getAnnotation(EventHandler::class.java).priority }
+    /**
+     * Invoke all event handlers for given event
+     * @param event Event that called post
+     */
+    @Suppress("kotlin:S6518")
+    override fun post(event: Event) = try {
+        val handlers = synchronized(lock) {
+            methodCache
+                .filterKeys { it.isAssignableFrom(event::class.java) }
+                .values
+                .onEach { list ->
+                    list.removeIf { it.target.get() == null }
+                }
+                .flatten()
+                .sortedByDescending { it.priority }
+        }
+
+        for (handler in handlers) {
+            val target = handler.target.get() ?: continue
+            handler.method.invoke(target, event)
+        }
+    } catch (e: Exception) {
+        LOGGER.error("Failed to invoke event: ${event::class.simpleName}")
+        e.printStackTrace()
+    }
+
+    /**
+     * Used to check if Method is valid for Event handling
+     * @return true if Method is valid
+     */
+    private fun Method.isValid(): Boolean {
+        if (!isAnnotationPresent(EventHandler::class.java)) return false
+        if (returnType != Void.TYPE) return false
+        if (parameterCount != 1) return false
+
+        return Event::class.java.isAssignableFrom(parameterTypes[0])
+    }
+
+    private fun allDeclaredMethods(klass: Class<*>): Sequence<Method> = sequence {
+        val seen = mutableSetOf<Class<*>>()
+        val queue = ArrayDeque<Class<*>>()
+
+        queue.add(klass)
+
+        while (queue.isNotEmpty()) {
+            val current = queue.removeFirst()
+
+            if (!seen.add(current)) continue
+            if (current == Any::class.java) continue
+
+            current.declaredMethods
+                .asSequence()
+                .filter { !it.isSynthetic && !it.isBridge }
+                .forEach { yield(it) }
+
+            current.superclass?.let { queue.add(it) }
+
+            current.interfaces.forEach { queue.add(it) }
+        }
+    }
 }
