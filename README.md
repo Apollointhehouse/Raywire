@@ -79,4 +79,4 @@ Contributions are welcome! Please open issues or pull requests on the [GitHub re
 
 
 ## License
-Raywire is licensed under the MIT License. See the LICENSE file for details.
+Raywire is licensed under the Apache 2.0 License. See the LICENSE file for details.
