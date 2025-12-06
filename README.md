@@ -14,7 +14,7 @@ Written in Kotlin, Raywire makes it easy to create, subscribe to, and manage cus
 
 ## Prerequisites
 
-- JDK 17 ([Eclipse Temurin](https://adoptium.net/temurin/releases/) recommended)
+- JDK 21 ([Eclipse Temurin](https://adoptium.net/temurin/releases/) recommended)
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) (Community Edition is sufficient)
 - Minecraft Development plugin (optional, but recommended)
 - BTA modding environment set up

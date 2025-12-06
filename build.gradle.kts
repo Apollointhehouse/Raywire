@@ -1,178 +1,149 @@
-@file:Suppress("UnstableApiUsage", "PropertyName")
-
-import org.apache.tools.ant.taskdefs.condition.Os
+import com.smushytaco.lwjgl_gradle.Preset
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
-    id("fabric-loom") version "1.10.0-bta"
-    id("maven-publish")
-    kotlin("jvm") version "2.1.21"
+	alias(libs.plugins.loom)
+	alias(libs.plugins.kotlin.jvm)
+	alias(libs.plugins.lwjgl)
+	java
+	`maven-publish`
 }
+val modVersion = providers.gradleProperty("mod_version")
+val modGroup = providers.gradleProperty("mod_group")
+val modName = providers.gradleProperty("mod_name")
 
-val lwjglVersion = "3.3.4"
+val javaVersion = libs.versions.java.map { it.toInt() }
 
-val lwjglNatives =
-    when {
-        Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC) -> "natives-linux"
-        Os.isFamily(Os.FAMILY_WINDOWS) -> "natives-windows"
-        Os.isFamily(Os.FAMILY_MAC) -> "natives-macos"
-        else -> error("Unsupported OS")
-    }
-
-val mod_group: String by project
-val mod_name: String by project
-val mod_version: String by project
-
-val bta_channel: String by project
-val bta_version: String by project
-
-val loader_version: String by project
-val mod_menu_version: String by project
-val flk_version: String by project
-
-val kotlin_version: String by project
-
-group = mod_group
-base.archivesName.set(mod_name)
-version = mod_version
-
+base.archivesName = modName
+group = modGroup.get()
+version = modVersion.get()
 loom {
-    noIntermediateMappings()
-    customMinecraftMetadata.set("https://downloads.betterthanadventure.net/bta-client/$bta_channel/v$bta_version/manifest.json")
+	customMinecraftMetadata.set("https://downloads.betterthanadventure.net/bta-client/${libs.versions.btaChannel.get()}/v${libs.versions.bta.get()}/manifest.json")
 }
-
 repositories {
-    mavenCentral()
-    maven { url = uri("https://jitpack.io") }
-    maven {
-        name = "Babric"
-        url = uri("https://maven.glass-launcher.net/babric")
-    }
-    maven {
-        name = "Fabric"
-        url = uri("https://maven.fabricmc.net/")
-    }
-    maven {
-        name = "SignalumMavenInfrastructure"
-        url = uri("https://maven.thesignalumproject.net/infrastructure")
-    }
-    maven {
-        name = "SignalumMavenReleases"
-        url = uri("https://maven.thesignalumproject.net/releases")
-    }
-    ivy {
-        url = uri("https://github.com/Better-than-Adventure")
-        patternLayout {
-            artifact("[organisation]/releases/download/v[revision]/[module].jar")
-        }
-        metadataSources { artifact() }
-    }
-    ivy {
-        url = uri("https://downloads.betterthanadventure.net/bta-client/$bta_channel/")
-        patternLayout {
-            artifact("/v[revision]/client.jar")
-        }
-        metadataSources { artifact() }
-    }
-    ivy {
-        url = uri("https://downloads.betterthanadventure.net/bta-server/$bta_channel/")
-        patternLayout {
-            artifact("/v[revision]/server.jar")
-        }
-        metadataSources { artifact() }
-    }
-    ivy {
-        url = uri("https://piston-data.mojang.com")
-        patternLayout {
-            artifact("v1/[organisation]/[revision]/[module].jar")
-        }
-        metadataSources { artifact() }
-    }
+	mavenCentral()
+	maven("https://jitpack.io")
+	maven("https://maven.fabricmc.net/") { name = "Fabric" }
+	maven("https://maven.thesignalumproject.net/infrastructure") { name = "SignalumMavenInfrastructure" }
+	maven("https://maven.thesignalumproject.net/releases") { name = "SignalumMavenReleases" }
+	ivy("https://github.com/Better-than-Adventure") {
+		patternLayout { artifact("[organisation]/releases/download/v[revision]/[module].jar") }
+		metadataSources { artifact() }
+	}
+	ivy("https://downloads.betterthanadventure.net/bta-client/${libs.versions.btaChannel.get()}/") {
+		patternLayout { artifact("/v[revision]/client.jar") }
+		metadataSources { artifact() }
+	}
+	ivy("https://downloads.betterthanadventure.net/bta-server/${libs.versions.btaChannel.get()}/") {
+		patternLayout { artifact("/v[revision]/server.jar") }
+		metadataSources { artifact() }
+	}
+	ivy("https://piston-data.mojang.com") {
+		patternLayout { artifact("v1/[organisation]/[revision]/[module].jar") }
+		metadataSources { artifact() }
+	}
 }
-
+lwjgl {
+	version = libs.versions.lwjgl
+	implementation(Preset.MINIMAL_OPENGL)
+}
 dependencies {
-    minecraft("::${bta_version}")
-    mappings(loom.layered {})
+	minecraft("::${libs.versions.bta.get()}")
 
-    modRuntimeOnly("objects:client:43db9b498cb67058d2e12d394e6507722e71bb45") // https://piston-data.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar
-    modImplementation("net.fabricmc:fabric-loader:$loader_version")
+	runtimeOnly(libs.clientJar)
+	implementation(libs.loader)
+	implementation(libs.modMenu)
+	implementation(libs.legacyLwjgl)
+	implementation(libs.fabric.language.kotlin) {
+		libs.loader.get().apply { this@implementation.exclude(group, name) }
+	}
 
-    modImplementation("turniplabs:modmenu-bta:$mod_menu_version")
+	implementation(libs.slf4jApi)
+	implementation(libs.guava)
+	implementation(libs.log4j.slf4j2.impl)
+	implementation(libs.log4j.core)
+	implementation(libs.log4j.api)
+	implementation(libs.log4j.api12)
+	implementation(libs.gson)
 
-    implementation("org.slf4j:slf4j-api:1.8.0-beta4")
-    implementation("org.apache.logging.log4j:log4j-slf4j18-impl:2.16.0")
-
-    implementation("com.google.guava:guava:33.0.0-jre")
-    implementation("com.google.code.gson:gson:2.10.1")
-
-    val log4jVersion = "2.20.0"
-    implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
-    implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
-    implementation("org.apache.logging.log4j:log4j-1.2-api:$log4jVersion")
-
-    implementation("org.apache.commons:commons-lang3:3.12.0")
-    include("org.apache.commons:commons-lang3:3.12.0")
-
-    modImplementation("com.github.Better-than-Adventure:legacy-lwjgl3:1.0.5")
-    implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
-
-    runtimeOnly("org.lwjgl:lwjgl::$lwjglNatives")
-    runtimeOnly("org.lwjgl:lwjgl-assimp::$lwjglNatives")
-    runtimeOnly("org.lwjgl:lwjgl-glfw::$lwjglNatives")
-    runtimeOnly("org.lwjgl:lwjgl-openal::$lwjglNatives")
-    runtimeOnly("org.lwjgl:lwjgl-opengl::$lwjglNatives")
-    runtimeOnly("org.lwjgl:lwjgl-stb::$lwjglNatives")
-    implementation("org.lwjgl:lwjgl:$lwjglVersion")
-    implementation("org.lwjgl:lwjgl-assimp:$lwjglVersion")
-    implementation("org.lwjgl:lwjgl-glfw:$lwjglVersion")
-    implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
-    implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
-    implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
-
-    modImplementation("net.fabricmc:fabric-language-kotlin:1.11.0+kotlin.2.0.0") {
-        exclude(group = "net.fabricmc", module = "fabric-loader")
-    }
+	implementation(libs.commonsLang3)
+	include(libs.commonsLang3)
 }
-
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-    withSourcesJar()
+	toolchain {
+		languageVersion = javaVersion.map { JavaLanguageVersion.of(it) }
+		vendor = JvmVendorSpec.ADOPTIUM
+	}
+	sourceCompatibility = JavaVersion.toVersion(javaVersion.get())
+	targetCompatibility = JavaVersion.toVersion(javaVersion.get())
+	withSourcesJar()
 }
-
-tasks.compileJava {
-    options.release.set(8)
+val licenseFile = run {
+	val rootLicense = layout.projectDirectory.file("LICENSE")
+	val parentLicense = layout.projectDirectory.file("../LICENSE")
+	when {
+		rootLicense.asFile.exists() -> {
+			logger.lifecycle("Using LICENSE from project root: {}", rootLicense.asFile)
+			rootLicense
+		}
+		parentLicense.asFile.exists() -> {
+			logger.lifecycle("Using LICENSE from parent directory: {}", parentLicense.asFile)
+			parentLicense
+		}
+		else -> {
+			logger.warn("No LICENSE file found in project or parent directory.")
+			null
+		}
+	}
 }
-
-tasks.jar {
-    from("LICENSE") {
-        rename { "${it}_${base.archivesName.get()}" }
-    }
+tasks {
+	withType<JavaCompile>().configureEach {
+		options.encoding = "UTF-8"
+		sourceCompatibility = javaVersion.get().toString()
+		targetCompatibility = javaVersion.get().toString()
+		if (javaVersion.get() > 8) options.release = javaVersion
+	}
+	named<UpdateDaemonJvm>("updateDaemonJvm") {
+		languageVersion = libs.versions.gradleJava.map { JavaLanguageVersion.of(it.toInt()) }
+		vendor = JvmVendorSpec.ADOPTIUM
+	}
+	withType<JavaExec>().configureEach { defaultCharacterEncoding = "UTF-8" }
+	withType<Javadoc>().configureEach { options.encoding = "UTF-8" }
+	withType<Test>().configureEach { defaultCharacterEncoding = "UTF-8" }
+	withType<KotlinCompile>().configureEach {
+		compilerOptions {
+			extraWarnings = true
+			jvmTarget = javaVersion.map { JvmTarget.valueOf("JVM_${if (it == 8) "1_8" else it}") }
+		}
+	}
+	withType<Jar>().configureEach {
+		licenseFile?.let {
+			from(it) {
+				rename { original -> "${original}_${archiveBaseName.get()}" }
+			}
+		}
+	}
+	processResources {
+		val resourceMap = mapOf(
+			"version" to modVersion.get(),
+			"fabricloader" to libs.versions.loader.get(),
+			"fabric_language_kotlin" to libs.versions.fabric.language.kotlin.get(),
+			"java" to libs.versions.java.get(),
+			"modmenu" to libs.versions.modMenu.get()
+		)
+		inputs.properties(resourceMap)
+		filesMatching("fabric.mod.json") { expand(resourceMap) }
+	}
 }
-
-configurations.configureEach {
-    // Removes LWJGL2 dependencies
-    exclude(group = "org.lwjgl.lwjgl")
-}
-
-tasks.processResources {
-    inputs.property("version", version)
-    filesMatching("fabric.mod.json") {
-        expand("version" to version)
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_1_8
-    }
-}
-
-// configure the maven publication
+// Removes LWJGL2 dependencies
+configurations.configureEach { exclude(group = "org.lwjgl.lwjgl") }
 publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
-    }
+	publications {
+		create<MavenPublication>("maven") {
+			groupId = modGroup.get()
+			artifactId = modName.get()
+			version = modVersion.get()
+			from(components["java"])
+		}
+	}
 }
