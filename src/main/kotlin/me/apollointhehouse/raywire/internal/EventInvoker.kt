@@ -16,6 +16,8 @@
 
 package me.apollointhehouse.raywire.internal
 
-import java.lang.ref.WeakReference
+import me.apollointhehouse.raywire.api.Event
 
-internal data class Handler(val target: WeakReference<Any>, val invoker: EventInvoker, val priority: Int)
+internal fun interface EventInvoker {
+    operator fun invoke(target: Any, event: Event)
+}
