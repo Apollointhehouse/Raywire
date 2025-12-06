@@ -186,6 +186,6 @@ https://github.com/Apollointhehouse/Raywire
 
 # License
 
-Raywire is licensed under the Apache 2.0 License.  
+Raywire is licensed under the Apache 2.0 license.  
 See the [LICENSE](LICENSE) file for details.
 
