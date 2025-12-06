@@ -16,21 +16,22 @@
 
 package me.apollointhehouse.raywire.internal
 
-import me.apollointhehouse.raywire.api.*
 import me.apollointhehouse.raywire.Raywire.LOGGER
+import me.apollointhehouse.raywire.api.Bus
+import me.apollointhehouse.raywire.api.Cancellable
+import me.apollointhehouse.raywire.api.Event
+import me.apollointhehouse.raywire.api.EventHandler
 import java.lang.ref.WeakReference
 import java.lang.reflect.Method
 import java.util.WeakHashMap
+import kotlin.collections.ArrayDeque
 
 internal class EventManager : Bus {
     private val lock = Any()
     private val methodCache: MutableMap<Class<*>, MutableList<Handler>> = mutableMapOf()
-    private val objectEventMap: MutableMap<Any, MutableList<Class<out Any>>> = WeakHashMap()
+    private val objectEventMap: MutableMap<Any, MutableList<Class<out Event>>> = WeakHashMap()
+    private val resolvedCache: MutableMap<Class<out Event>, List<Handler>> = mutableMapOf()
 
-    /**
-     * Subscribes given object to scan for event handlers to be invoked
-     * @param obj the object to be subscribed
-     */
     override fun subscribe(obj: Any) {
         synchronized(lock) {
             if (objectEventMap.containsKey(obj)) return
@@ -43,7 +44,8 @@ internal class EventManager : Bus {
                 .toList()
 
             for (method in methods) {
-                val eventClass = method.parameterTypes[0]
+                @Suppress("UNCHECKED_CAST")
+                val eventClass = method.parameterTypes[0] as Class<out Event>
                 val priority = method.getAnnotation(EventHandler::class.java).priority
                 val handler = Handler(WeakReference(obj), method, priority)
 
@@ -59,15 +61,10 @@ internal class EventManager : Bus {
 
                 objectEventMap.getOrPut(obj) { mutableListOf() }.add(eventClass)
             }
+            resolvedCache.clear()
         }
     }
 
-
-    /**
-     * Unsubscribes given object from being scanned for event handlers to be invoked
-     * @param obj the object to be unsubscribed
-     */
-    @Suppress("kotlin:S6518")
     override fun unsubscribe(obj: Any) {
         synchronized(lock) {
             objectEventMap[obj]?.forEach { eventClass ->
@@ -77,33 +74,32 @@ internal class EventManager : Bus {
                 }
             }
             objectEventMap.remove(obj)
+            resolvedCache.clear()
         }
     }
 
-    /**
-     * Invoke all event handlers for given event
-     * @param event Event that called post
-     */
-    @Suppress("kotlin:S6518")
-    override fun post(event: Event) = try {
+    override fun post(event: Event, respectCancels: Boolean) {
+        val cancellable = if (respectCancels) event as? Cancellable else null
+
+        if (cancellable?.cancelled == true) return
+
         val handlers = synchronized(lock) {
-            methodCache
-                .filterKeys { it.isAssignableFrom(event::class.java) }
-                .values
-                .onEach { list ->
-                    list.removeIf { it.target.get() == null }
-                }
-                .flatten()
-                .sortedByDescending { it.priority }
+            val eventClass = event::class.java
+            resolvedCache[eventClass]
+                ?: collectHandlersFor(eventClass)
+                    .sortedByDescending { it.priority }
+                    .also { resolvedCache[eventClass] = it }
         }
 
         for (handler in handlers) {
-            val target = handler.target.get() ?: continue
-            handler.method.invoke(target, event)
+            if (cancellable?.cancelled == true) break
+            try {
+                val target = handler.target.get() ?: continue
+                handler.method.invoke(target, event)
+            } catch (e: Exception) {
+                LOGGER.error("Failed to invoke handler for event: ${event::class.simpleName}", e)
+            }
         }
-    } catch (e: Exception) {
-        LOGGER.error("Failed to invoke event: ${event::class.simpleName}")
-        e.printStackTrace()
     }
 
     /**
@@ -139,5 +135,35 @@ internal class EventManager : Bus {
 
             current.interfaces.forEach { queue.add(it) }
         }
+    }
+
+    private fun collectHandlersFor(eventClass: Class<out Event>): List<Handler> {
+        val result = mutableListOf<Handler>()
+        val seen = mutableSetOf<Class<*>>()
+        val queue = ArrayDeque<Class<*>>()
+
+        queue.add(eventClass)
+
+        while (queue.isNotEmpty()) {
+            val current = queue.removeFirst()
+            if (!seen.add(current)) continue
+
+            @Suppress("UNCHECKED_CAST")
+            val handlers = methodCache[current as Class<out Event>]
+            if (handlers != null) {
+                handlers.removeIf { it.target.get() == null }
+                result.addAll(handlers)
+            }
+
+            current.superclass
+                ?.takeIf { Event::class.java.isAssignableFrom(it) }
+                ?.let { queue.add(it) }
+
+            current.interfaces
+                .filter { Event::class.java.isAssignableFrom(it) }
+                .forEach { queue.add(it) }
+        }
+
+        return result
     }
 }
