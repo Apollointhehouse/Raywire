@@ -6,7 +6,6 @@ plugins {
 	alias(libs.plugins.kotlin.jvm)
 	alias(libs.plugins.yumiGradleLicenser)
 	alias(libs.plugins.lwjgl)
-	java
 	`maven-publish`
 }
 val modVersion = providers.gradleProperty("mod_version")
@@ -69,6 +68,9 @@ dependencies {
 
 	implementation(libs.commonsLang3)
 	include(libs.commonsLang3)
+
+	api(libs.eventLibrary)
+	include(libs.eventLibrary)
 }
 java {
 	toolchain {

@@ -12,7 +12,7 @@ lwjglPlugin = "1.0.0"
 ##########################################################################
 # Java Configuration
 # The Java version the JDK will be for compiling and running code.
-java = "8"
+java = "17"
 # The Java version the JDK will be for running Gradle.
 gradleJava = "21"
 ##########################################################################
@@ -31,6 +31,8 @@ legacyLwjgl = "1.0.6"
 fabric-language-kotlin = "1.13.7+kotlin.2.2.21"
 ##########################################################################
 # Dependencies
+# Check this on https://central.sonatype.com/artifact/com.smushytaco/event-library/
+eventLibrary = "1.0.0"
 # Check this on https://central.sonatype.com/artifact/org.slf4j/slf4j-api/
 slf4jApi = "2.0.17"
 # Check this on https://central.sonatype.com/artifact/com.google.guava/guava/
@@ -50,6 +52,7 @@ loader = { group = "net.fabricmc", name = "fabric-loader", version.ref = "loader
 modMenu = { group = "turniplabs", name = "modmenu-bta", version.ref = "modMenu" }
 legacyLwjgl = { group = "com.github.Better-than-Adventure", name = "legacy-lwjgl3", version.ref = "legacyLwjgl" }
 fabric-language-kotlin = { group = "net.fabricmc", name = "fabric-language-kotlin", version.ref = "fabric-language-kotlin" }
+eventLibrary = { group = "com.smushytaco", name = "event-library", version.ref = "eventLibrary" }
 slf4jApi = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jApi" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 log4j-slf4j2-impl = { group = "org.apache.logging.log4j", name = "log4j-slf4j2-impl", version.ref = "log4j" }
