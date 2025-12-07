@@ -66,7 +66,9 @@ dependencies {
 	implementation(libs.log4j.api12)
 	implementation(libs.gson)
 
+	implementation(libs.caffeine)
 	implementation(libs.commonsLang3)
+	include(libs.caffeine)
 	include(libs.commonsLang3)
 
 	api(libs.eventLibrary)
