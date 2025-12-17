@@ -32,7 +32,7 @@ fabric-language-kotlin = "1.13.8+kotlin.2.3.0"
 ##########################################################################
 # Dependencies
 # Check this on https://central.sonatype.com/artifact/com.smushytaco/event-library/
-eventLibrary = "4.0.6"
+eventLibrary = "4.1.0"
 # Check this on https://github.com/SmushyTaco/Event-Library/blob/main/gradle/libs.versions.toml#L29
 caffeine = "3.2.3"
 # Check this on https://central.sonatype.com/artifact/org.slf4j/slf4j-api/
