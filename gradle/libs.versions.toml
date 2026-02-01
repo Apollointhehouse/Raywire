@@ -6,7 +6,7 @@ loom = "1.15-SNAPSHOT"
 # Check this on https://kotlinlang.org/docs/releases.html
 kotlin = "2.3.0"
 # Check this on https://plugins.gradle.org/plugin/dev.yumi.gradle.licenser/
-yumiGradleLicenser = "2.2.1"
+yumiGradleLicenser = "2.2.2"
 # Check this on https://plugins.gradle.org/plugin/com.smushytaco.lwjgl3/
 lwjglPlugin = "1.0.1"
 ##########################################################################
