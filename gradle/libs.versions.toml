@@ -4,7 +4,7 @@
 # Check this on https://github.com/FabricMC/fabric-loom/releases/latest/
 loom = "1.15-SNAPSHOT"
 # Check this on https://kotlinlang.org/docs/releases.html
-kotlin = "2.3.0"
+kotlin = "2.3.20"
 # Check this on https://plugins.gradle.org/plugin/dev.yumi.gradle.licenser/
 yumiGradleLicenser = "2.2.2"
 # Check this on https://plugins.gradle.org/plugin/com.smushytaco.lwjgl3/
@@ -24,11 +24,11 @@ btaChannel = "release"
 # Check this on https://maven.thesignalumproject.net/#/infrastructure/net/fabricmc/fabric-loader/
 loader = "0.18.4-bta.10"
 # Check this on https://github.com/Turnip-Labs/ModMenu/releases/latest/
-modMenu = "4.0.0"
-# Check this on https://github.com/Better-than-Adventure/legacy-lwjgl3/releases/latest/
+modMenu = "4.0.1"
+# Check this on https://maven.thesignalumproject.net/#/infrastructure/com/github/Better-than-Adventure/legacy-lwjgl3/
 legacyLwjgl = "1.0.6"
 # Check this on https://modrinth.com/mod/fabric-language-kotlin/versions/
-fabric-language-kotlin = "1.13.8+kotlin.2.3.0"
+fabric-language-kotlin = "1.13.10+kotlin.2.3.20"
 ##########################################################################
 # Dependencies
 # Check this on https://central.sonatype.com/artifact/com.smushytaco/event-library/
